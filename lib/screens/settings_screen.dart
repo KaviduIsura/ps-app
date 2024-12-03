@@ -1,256 +1,305 @@
 import 'package:flutter/material.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
-
-  @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  double _minTemperature = 18;
-  double _maxTemperature = 28;
-  double _minHumidity = 60;
-  double _maxHumidity = 80;
-  double _minLightIntensity = 500;
-  double _maxLightIntensity = 1000;
-  double _minSoilMoisture = 30;
-  double _maxSoilMoisture = 70;
-  bool _darkMode = false;
-  bool _emailNotifications = true;
-  bool _pushNotifications = true;
-  bool _alertSounds = true;
-  String _timeZone = 'UTC';
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Settings"),
+        backgroundColor: Colors.green,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Threshold Configurations Section (Large Card)
+            const SectionHeader(title: "Threshold Configurations"),
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ThresholdCard(
+                      title: "Temperature",
+                      minController: TextEditingController(text: '18'),
+                      maxController: TextEditingController(text: '28'),
+                      unit: "°C",
+                    ),
+                    const SizedBox(height: 16),
+                    ThresholdCard(
+                      title: "Humidity",
+                      minController: TextEditingController(text: '60'),
+                      maxController: TextEditingController(text: '80'),
+                      unit: "%",
+                    ),
+                    const SizedBox(height: 16),
+                    ThresholdCard(
+                      title: "Light Intensity",
+                      minController: TextEditingController(text: '500'),
+                      maxController: TextEditingController(text: '1000'),
+                      unit: "lux",
+                    ),
+                    const SizedBox(height: 16),
+                    ThresholdCard(
+                      title: "Soil Moisture",
+                      minController: TextEditingController(text: '30'),
+                      maxController: TextEditingController(text: '70'),
+                      unit: "%",
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () {
+                        // Save logic can be added here
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                      child: const Text(
+                        "Save Changes",
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 30), // Space between sections
+
+            // User Preferences Section in Card
+            const SectionHeader(title: "User Preferences"),
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: const [
+                    SwitchRow(label: "Dark Mode", value: false),
+                    SwitchRow(label: "Email Notifications", value: true),
+                    SwitchRow(label: "Push Notifications", value: true),
+                    SwitchRow(label: "Alert Sounds", value: true),
+                    DropdownButton<String>(
+                      isExpanded: true,
+                      value: "UTC",
+                      items: ["UTC", "GMT", "EST"].map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      onChanged: null, // Handle change
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 30), // Space between sections
+
+            // Device Management Section in Card
+            const SectionHeader(title: "Device Management"),
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    DeviceTile(
+                        deviceName: "Temperature Sensor 1",
+                        deviceType: "temperature",
+                        status: "online"),
+                    DeviceTile(
+                        deviceName: "Humidity Sensor 1",
+                        deviceType: "humidity",
+                        status: "online"),
+                    ElevatedButton.icon(
+                      onPressed: () {},
+                      icon: const Icon(Icons.add),
+                      label: const Text("Add Device"),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SectionHeader extends StatelessWidget {
+  final String title;
+  const SectionHeader({required this.title, Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+}
+
+class ThresholdCard extends StatelessWidget {
+  final String title;
+  final TextEditingController minController;
+  final TextEditingController maxController;
+  final String unit;
+
+  const ThresholdCard({
+    required this.title,
+    required this.minController,
+    required this.maxController,
+    required this.unit,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(flex: 2, child: const Text("Min")),
+                Expanded(
+                  flex: 4,
+                  child: TextFormField(
+                    controller: minController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: 'Min',
+                      suffixText: unit,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(flex: 2, child: const Text("Max")),
+                Expanded(
+                  flex: 4,
+                  child: TextFormField(
+                    controller: maxController,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      hintText: 'Max',
+                      suffixText: unit,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SwitchRow extends StatelessWidget {
+  final String label;
+  final bool value;
+
+  const SwitchRow({required this.label, required this.value, Key? key})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'Settings',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'Threshold Configurations',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          _ThresholdSetting(
-            title: 'Temperature',
-            min: _minTemperature,
-            max: _maxTemperature,
-            unit: '°C',
-            onMinChanged: (value) {
-              setState(() {
-                _minTemperature = value;
-              });
-            },
-            onMaxChanged: (value) {
-              setState(() {
-                _maxTemperature = value;
-              });
-            },
-          ),
-          _ThresholdSetting(
-            title: 'Humidity',
-            min: _minHumidity,
-            max: _maxHumidity,
-            unit: '%',
-            onMinChanged: (value) {
-              setState(() {
-                _minHumidity = value;
-              });
-            },
-            onMaxChanged: (value) {
-              setState(() {
-                _maxHumidity = value;
-              });
-            },
-          ),
-          _ThresholdSetting(
-            title: 'Light Intensity',
-            min: _minLightIntensity,
-            max: _maxLightIntensity,
-            unit: 'lux',
-            onMinChanged: (value) {
-              setState(() {
-                _minLightIntensity = value;
-              });
-            },
-            onMaxChanged: (value) {
-              setState(() {
-                _maxLightIntensity = value;
-              });
-            },
-          ),
-          _ThresholdSetting(
-            title: 'Soil Moisture',
-            min: _minSoilMoisture,
-            max: _maxSoilMoisture,
-            unit: '%',
-            onMinChanged: (value) {
-              setState(() {
-                _minSoilMoisture = value;
-              });
-            },
-            onMaxChanged: (value) {
-              setState(() {
-                _maxSoilMoisture = value;
-              });
-            },
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'User Preferences',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 16),
-          SwitchListTile(
-            title: const Text('Dark Mode'),
-            value: _darkMode,
-            onChanged: (value) {
-              setState(() {
-                _darkMode = value;
-              });
-            },
-          ),
-          const Text('Notifications'),
-          SwitchListTile(
-            title: const Text('Email Notifications'),
-            value: _emailNotifications,
-            onChanged: (value) {
-              setState(() {
-                _emailNotifications = value;
-              });
-            },
-          ),
-          SwitchListTile(
-            title: const Text('Push Notifications'),
-            value: _pushNotifications,
-            onChanged: (value) {
-              setState(() {
-                _pushNotifications = value;
-              });
-            },
-          ),
-          SwitchListTile(
-            title: const Text('Alert Sounds'),
-            value: _alertSounds,
-            onChanged: (value) {
-              setState(() {
-                _alertSounds = value;
-              });
-            },
-          ),
-          const SizedBox(height: 16),
-          const Text('Time Zone'),
-          DropdownButton<String>(
-            value: _timeZone,
-            onChanged: (String? newValue) {
-              setState(() {
-                _timeZone = newValue!;
-              });
-            },
-            items: <String>['UTC', 'GMT', 'EST', 'PST', 'CST']
-                .map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {
-              // TODO: Implement save changes functionality
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Changes saved')),
-              );
-            },
-            child: const Text('Save Changes'),
-          ),
+          Text(label),
+          Switch(value: value, onChanged: (bool newValue) {}),
         ],
       ),
     );
   }
 }
 
-class _ThresholdSetting extends StatelessWidget {
-  final String title;
-  final double min;
-  final double max;
-  final String unit;
-  final ValueChanged<double> onMinChanged;
-  final ValueChanged<double> onMaxChanged;
-
-  const _ThresholdSetting({
-    required this.title,
-    required this.min,
-    required this.max,
-    required this.unit,
-    required this.onMinChanged,
-    required this.onMaxChanged,
-  });
-
+class DeviceManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title),
-        Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Minimum'),
-                  Slider(
-                    value: min,
-                    min: 0,
-                    max: 100,
-                    divisions: 100,
-                    label: min.round().toString(),
-                    onChanged: onMinChanged,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('Maximum'),
-                  Slider(
-                    value: max,
-                    min: 0,
-                    max: 100,
-                    divisions: 100,
-                    label: max.round().toString(),
-                    onChanged: onMaxChanged,
-                  ),
-                ],
-              ),
-            ),
-          ],
+        DeviceTile(
+            deviceName: "Temperature Sensor 1",
+            deviceType: "temperature",
+            status: "online"),
+        DeviceTile(
+            deviceName: "Humidity Sensor 1",
+            deviceType: "humidity",
+            status: "online"),
+        ElevatedButton.icon(
+          onPressed: () {},
+          icon: const Icon(Icons.add),
+          label: const Text("Add Device"),
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
         ),
-        Text('${min.round()} $unit - ${max.round()} $unit'),
-        const SizedBox(height: 16),
       ],
+    );
+  }
+}
+
+class DeviceTile extends StatelessWidget {
+  final String deviceName;
+  final String deviceType;
+  final String status;
+
+  const DeviceTile({
+    required this.deviceName,
+    required this.deviceType,
+    required this.status,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: ListTile(
+        title: Text(deviceName),
+        subtitle: Text("Type: $deviceType"),
+        trailing: Text(
+          status,
+          style:
+              const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 }
