@@ -12,6 +12,7 @@ class GreenControlApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'GreenControl',
+      debugShowCheckedModeBanner: false, // Remove debug banner
       theme: ThemeData(
         primaryColor: const Color(0xFF2E7D32),
         colorScheme: ColorScheme.fromSeed(
