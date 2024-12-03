@@ -74,68 +74,14 @@ class SettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 30), // Space between sections
 
-            // User Preferences Section in Card
+            // User Preferences Section
             const SectionHeader(title: "User Preferences"),
-            Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: const [
-                    SwitchRow(label: "Dark Mode", value: false),
-                    SwitchRow(label: "Email Notifications", value: true),
-                    SwitchRow(label: "Push Notifications", value: true),
-                    SwitchRow(label: "Alert Sounds", value: true),
-                    DropdownButton<String>(
-                      isExpanded: true,
-                      value: "UTC",
-                      items: ["UTC", "GMT", "EST"].map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      onChanged: null, // Handle change
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            UserPreferences(),
             const SizedBox(height: 30), // Space between sections
 
-            // Device Management Section in Card
+            // Device Management Section
             const SectionHeader(title: "Device Management"),
-            Card(
-              elevation: 5,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    DeviceTile(
-                        deviceName: "Temperature Sensor 1",
-                        deviceType: "temperature",
-                        status: "online"),
-                    DeviceTile(
-                        deviceName: "Humidity Sensor 1",
-                        deviceType: "humidity",
-                        status: "online"),
-                    ElevatedButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.add),
-                      label: const Text("Add Device"),
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            DeviceManagement(),
           ],
         ),
       ),
@@ -225,6 +171,31 @@ class ThresholdCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class UserPreferences extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SwitchRow(label: "Dark Mode", value: false),
+        SwitchRow(label: "Email Notifications", value: true),
+        SwitchRow(label: "Push Notifications", value: true),
+        SwitchRow(label: "Alert Sounds", value: true),
+        DropdownButton<String>(
+          isExpanded: true,
+          value: "UTC",
+          items: ["UTC", "GMT", "EST"].map((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {},
+        ),
+      ],
     );
   }
 }
