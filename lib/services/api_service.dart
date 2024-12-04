@@ -22,7 +22,7 @@ class ApiService {
   }
 
   // Fetch control states
-  static Future<Map<String, dynamic>?> getControlStates() async {
+  static Future<Map<String, dynamic>?> getControlStates1() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/control'));
       if (response.statusCode == 200) {
