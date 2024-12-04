@@ -2,27 +2,38 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'http://127.0.0.1:5000/api';
+  static const String baseUrl =
+      "http://localhost:5000/api"; // Replace localhost with your actual backend URL
 
   // Fetch sensor data
-  static Future<List<dynamic>> fetchSensorData() async {
-    final response = await http.get(Uri.parse('$baseUrl/data'));
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Failed to fetch data');
+  static Future<Map<String, dynamic>?> getSensorData() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/sensor'));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        print("Failed to load sensor data: ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Error fetching sensor data: $e");
+      return null;
     }
   }
 
-  // Add sensor data
-  static Future<void> addSensorData(Map<String, dynamic> data) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/data'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode(data),
-    );
-    if (response.statusCode != 201) {
-      throw Exception('Failed to add data');
+  // Fetch control states
+  static Future<Map<String, dynamic>?> getControlStates() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/control'));
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        print("Failed to load control states: ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Error fetching control states: $e");
+      return null;
     }
   }
 }
