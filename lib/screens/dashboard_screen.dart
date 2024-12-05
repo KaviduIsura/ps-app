@@ -11,7 +11,9 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   Map<String, dynamic> _sensorData = {};
+  Map<String, dynamic> _sensorData2 = {};
   Map<String, dynamic> _controlStates = {};
+  Map<String, dynamic> _controlStates2 = {};
   Timer? _timer;
 
   @override
@@ -31,12 +33,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _fetchData() async {
     try {
-      // Fetch sensor data
+      // Fetch sensor data 1
       final sensorData = await ApiService.getSensorData();
       if (sensorData != null) {
         setState(() {
           _sensorData =
               sensorData['list'].isNotEmpty ? sensorData['list'].last : {};
+        });
+      }
+      final sensorData2 = await ApiService.getSensorData2();
+      if (sensorData2 != null) {
+        setState(() {
+          _sensorData2 =
+              sensorData2['list'].isNotEmpty ? sensorData2['list'].last : {};
         });
       }
 
@@ -45,6 +54,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (controlStates != null) {
         setState(() {
           _controlStates = controlStates;
+        });
+      }
+
+      final controlStates2 = await ApiService.getControlStates2();
+      if (controlStates2 != null) {
+        setState(() {
+          _controlStates2 = controlStates2;
         });
       }
     } catch (e) {
@@ -61,9 +77,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           const Text(
             'Greenhouse Overview',
+            textAlign: TextAlign.center, // Center the text horizontally
             style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+              fontSize: 26, // Increase font size for prominence
+              fontWeight: FontWeight.bold, // Keep it bold for emphasis
+              color: Colors.black87,
+              // Change color for a fresh, nature-inspired look
+              letterSpacing: 1, // Add some space between letters
+              height: 1.5, // Adjust line height for better readability
             ),
           ),
           const SizedBox(height: 24),
@@ -79,7 +100,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 value:
                     '${_sensorData['temperature']?.toStringAsFixed(1) ?? 'N/A'}°C',
                 icon: Icons.thermostat,
-                trend: 'Live Data',
+                trend: '+2°C from yesterday',
                 trendPositive: true,
               ),
               _MetricCard(
@@ -87,7 +108,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 value:
                     '${_sensorData['humidity']?.toStringAsFixed(1) ?? 'N/A'}%',
                 icon: Icons.water_drop,
-                trend: 'Live Data',
+                trend: '-5% from yesterday',
                 trendPositive: true,
               ),
               _MetricCard(
@@ -95,42 +116,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 value:
                     '${_sensorData['lightIntensity']?.toStringAsFixed(0) ?? 'N/A'} lux',
                 icon: Icons.light_mode,
-                trend: 'Live Data',
+                trend: 'Normal',
                 trendPositive: true,
               ),
               _MetricCard(
                 title: 'Soil Moisture',
-                value: 'N/A', // Add this when you have soil moisture data
+                value:
+                    '${_sensorData2['soilMoisture']?.toStringAsFixed(0) ?? 'N/A'} %', // Add this when you have soil moisture data
                 icon: Icons.grass,
-                trend: 'Live Data',
+                trend: 'Optimal',
                 trendPositive: true,
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          const Text(
-            'System Status',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-          ),
-          const SizedBox(height: 16),
-          _SystemStatusTile(
-            title: 'Ventilation System (Fan 1)',
-            isActive: _controlStates['fan1'] ?? false,
-          ),
-          _SystemStatusTile(
-            title: 'Irrigation System (Fan 2)',
-            isActive: _controlStates['fan2'] ?? false,
-          ),
-          _SystemStatusTile(
-            title: 'Lighting System (LED)',
-            isActive: _controlStates['led'] ?? false,
-          ),
-          _SystemStatusTile(
-            title: 'Climate Control',
-            isActive: true,
+            margin: const EdgeInsets.all(12),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  const Text(
+                    'System Status',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  _SystemStatusTile(
+                    title: 'Temperature Controller',
+                    isActive: _controlStates['fan1'] ?? false,
+                  ),
+                  _SystemStatusTile(
+                    title: 'Humidity Controller',
+                    isActive: _controlStates['fan2'] ?? false,
+                  ),
+                  _SystemStatusTile(
+                    title: 'Artificial Sunlight',
+                    isActive: _controlStates['led'] ?? true,
+                  ),
+                  _SystemStatusTile(
+                    title: 'Irrigation System',
+                    isActive: _controlStates2['Realy'] ?? false,
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
