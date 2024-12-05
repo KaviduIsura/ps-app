@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _screens = [
     const DashboardScreen(),
-    const SensorDataScreen(),
+    SensorDataScreen(),
     const ManualControlsScreen(),
     const SettingsScreen(),
     const AboutScreen(),

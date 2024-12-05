@@ -1,85 +1,95 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../services/api_service.dart'; // Import the ApiService
 
-class SensorDataScreen extends StatelessWidget {
+class SensorDataScreen extends StatefulWidget {
   const SensorDataScreen({super.key});
 
   @override
+  _SensorDataScreenState createState() => _SensorDataScreenState();
+}
+
+class _SensorDataScreenState extends State<SensorDataScreen> {
+  List<dynamic> sensorData = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSensorData();
+  }
+
+  Future<void> _fetchSensorData() async {
+    final data = await ApiService.getSensorData();
+    setState(() {
+      if (data != null && data.containsKey('list')) {
+        sensorData = data['list'];
+      } else {
+        sensorData = [];
+      }
+      isLoading = false;
+    });
+  }
+
+  List<FlSpot> _extractData(String key) {
+    return sensorData
+        .map<FlSpot>((entry) => FlSpot(
+              DateTime.parse(entry['timestamp'])
+                  .millisecondsSinceEpoch
+                  .toDouble(),
+              entry[key]?.toDouble() ?? 0.0,
+            ))
+        .toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Sensor Data',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 24),
-          _SensorChart(
-            title: 'Temperature',
-            color: Colors.red,
-            data: [
-              FlSpot(0, 22),
-              FlSpot(1, 23),
-              FlSpot(2, 25),
-              FlSpot(3, 24),
-              FlSpot(4, 26),
-              FlSpot(5, 25),
-              FlSpot(6, 23),
-            ],
-            unit: '°C',
-          ),
-          const SizedBox(height: 24),
-          _SensorChart(
-            title: 'Humidity',
-            color: Colors.blue,
-            data: [
-              FlSpot(0, 65),
-              FlSpot(1, 68),
-              FlSpot(2, 67),
-              FlSpot(3, 69),
-              FlSpot(4, 66),
-              FlSpot(5, 70),
-              FlSpot(6, 68),
-            ],
-            unit: '%',
-          ),
-          const SizedBox(height: 24),
-          _SensorChart(
-            title: 'Light Intensity',
-            color: Colors.orange,
-            data: [
-              FlSpot(0, 800),
-              FlSpot(1, 850),
-              FlSpot(2, 900),
-              FlSpot(3, 875),
-              FlSpot(4, 925),
-              FlSpot(5, 850),
-              FlSpot(6, 875),
-            ],
-            unit: 'lux',
-          ),
-          const SizedBox(height: 24),
-          _SensorChart(
-            title: 'Air Flow',
-            color: Colors.green,
-            data: [
-              FlSpot(0, 0.4),
-              FlSpot(1, 0.5),
-              FlSpot(2, 0.6),
-              FlSpot(3, 0.5),
-              FlSpot(4, 0.7),
-              FlSpot(5, 0.6),
-              FlSpot(6, 0.5),
-            ],
-            unit: 'm/s',
-          ),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Sensor Data"),
       ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : sensorData.isEmpty
+              ? const Center(
+                  child: Text("No sensor data available."),
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Sensor Data',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      _SensorChart(
+                        title: 'Temperature',
+                        color: Colors.red,
+                        data: _extractData('temperature'),
+                        unit: '°C',
+                      ),
+                      const SizedBox(height: 24),
+                      _SensorChart(
+                        title: 'Humidity',
+                        color: Colors.blue,
+                        data: _extractData('humidity'),
+                        unit: '%',
+                      ),
+                      const SizedBox(height: 24),
+                      _SensorChart(
+                        title: 'Light Intensity',
+                        color: Colors.orange,
+                        data: _extractData('lightIntensity'),
+                        unit: 'lux',
+                      ),
+                    ],
+                  ),
+                ),
     );
   }
 }
@@ -96,6 +106,11 @@ class _SensorChart extends StatelessWidget {
     required this.data,
     required this.unit,
   });
+
+  String _formatTimestamp(double timestamp) {
+    final date = DateTime.fromMillisecondsSinceEpoch(timestamp.toInt());
+    return "${date.hour}:${date.minute}";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,9 +132,7 @@ class _SensorChart extends StatelessWidget {
                   ),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () {
-                    // TODO: Implement CSV download
-                  },
+                  onPressed: () => _downloadCsv(title.toLowerCase(), data),
                   icon: const Icon(Icons.download),
                   label: const Text('Download CSV'),
                 ),
@@ -130,15 +143,48 @@ class _SensorChart extends StatelessWidget {
               height: 200,
               child: LineChart(
                 LineChartData(
-                  gridData: FlGridData(show: false),
-                  titlesData: FlTitlesData(show: false),
-                  borderData: FlBorderData(show: false),
-                  minX: 0,
-                  maxX: 6,
-                  minY:
-                      data.map((e) => e.y).reduce((a, b) => a < b ? a : b) - 1,
-                  maxY:
-                      data.map((e) => e.y).reduce((a, b) => a > b ? a : b) + 1,
+                  gridData: FlGridData(show: true),
+                  titlesData: FlTitlesData(
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 40,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            value.toStringAsFixed(1),
+                            style: const TextStyle(fontSize: 12),
+                          );
+                        },
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 22,
+                        getTitlesWidget: (value, meta) {
+                          return Text(
+                            _formatTimestamp(value),
+                            style: const TextStyle(fontSize: 12),
+                          );
+                        },
+                      ),
+                    ),
+                    topTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                  ),
+                  borderData: FlBorderData(show: true),
+                  minX: data.isNotEmpty ? data.first.x : 0,
+                  maxX: data.isNotEmpty ? data.last.x : 0,
+                  minY: data.isNotEmpty
+                      ? data.map((e) => e.y).reduce((a, b) => a < b ? a : b) - 1
+                      : 0,
+                  maxY: data.isNotEmpty
+                      ? data.map((e) => e.y).reduce((a, b) => a > b ? a : b) + 1
+                      : 0,
                   lineBarsData: [
                     LineChartBarData(
                       spots: data,
@@ -157,5 +203,14 @@ class _SensorChart extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _downloadCsv(String sensorType, List<FlSpot> data) {
+    final csvContent = [
+      'Timestamp,Value',
+      ...data.map((point) => '${point.x},${point.y}'),
+    ].join('\n');
+    // Implement file download using `csvContent`.
+    print('CSV content for $sensorType:\n$csvContent');
   }
 }

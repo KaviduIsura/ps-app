@@ -114,7 +114,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               _MetricCard(
                 title: 'Light Intensity',
                 value:
-                    '${_sensorData['lightIntensity']?.toStringAsFixed(0) ?? 'N/A'} lux',
+                    '${_sensorData['lightIntensity']?.toStringAsFixed(0) ?? 'N/A'} %',
                 icon: Icons.light_mode,
                 trend: 'Normal',
                 trendPositive: true,
@@ -163,7 +163,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   _SystemStatusTile(
                     title: 'Irrigation System',
-                    isActive: _controlStates2['Realy'] ?? false,
+                    isActive: _controlStates2['valve'] ?? false,
+                  ),
+                  _SystemStatusTile(
+                    title: 'Motion Alert',
+                    isActive: _controlStates2['led'] ?? false,
                   ),
                 ],
               ),
