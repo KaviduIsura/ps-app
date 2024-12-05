@@ -87,6 +87,13 @@ class _SensorDataScreenState extends State<SensorDataScreen> {
                         data: _extractData('lightIntensity'),
                         unit: 'lux',
                       ),
+                      const SizedBox(height: 24),
+                      _SensorChart(
+                        title: 'Soil Moisture',
+                        color: Colors.green,
+                        data: _extractData('soilMoisture'),
+                        unit: '%',
+                      ),
                     ],
                   ),
                 ),
