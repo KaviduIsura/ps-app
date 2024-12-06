@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screens/loading_screen.dart'; // Add the import for loading screen
 import 'screens/home_screen.dart';
 
 void main() {
@@ -20,7 +21,7 @@ class GreenControlApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+      home: const LoadingScreen(), // Set LoadingScreen as the initial screen
     );
   }
 }
