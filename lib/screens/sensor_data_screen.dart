@@ -57,9 +57,6 @@ class _SensorDataScreenState extends State<SensorDataScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Sensor Data"),
-      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : (generalSensorData.isEmpty && soilMoistureData.isEmpty)
