@@ -147,11 +147,7 @@ class _SensorChart extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                ElevatedButton.icon(
-                  onPressed: () => _downloadCsv(title.toLowerCase(), data),
-                  icon: const Icon(Icons.download),
-                  label: const Text('Download CSV'),
-                ),
+                // Removed the download CSV button
               ],
             ),
             const SizedBox(height: 16),
@@ -219,14 +215,5 @@ class _SensorChart extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _downloadCsv(String sensorType, List<FlSpot> data) {
-    final csvContent = [
-      'Timestamp,Value',
-      ...data.map((point) => '${point.x},${point.y}'),
-    ].join('\n');
-    // Implement file download using `csvContent`.
-    print('CSV content for $sensorType:\n$csvContent');
   }
 }
