@@ -10,7 +10,8 @@ class SensorDataScreen extends StatefulWidget {
 }
 
 class _SensorDataScreenState extends State<SensorDataScreen> {
-  List<dynamic> sensorData = [];
+  List<dynamic> generalSensorData = [];
+  List<dynamic> soilMoistureData = [];
   bool isLoading = true;
 
   @override
@@ -20,19 +21,30 @@ class _SensorDataScreenState extends State<SensorDataScreen> {
   }
 
   Future<void> _fetchSensorData() async {
-    final data = await ApiService.getSensorData();
+    // Fetch general sensor data
+    final generalData = await ApiService.getSensorData();
+    // Fetch soil moisture data
+    final moistureData = await ApiService.getSensorData2();
+
     setState(() {
-      if (data != null && data.containsKey('list')) {
-        sensorData = data['list'];
+      if (generalData != null && generalData.containsKey('list')) {
+        generalSensorData = generalData['list'];
       } else {
-        sensorData = [];
+        generalSensorData = [];
       }
+
+      if (moistureData != null && moistureData.containsKey('list')) {
+        soilMoistureData = moistureData['list'];
+      } else {
+        soilMoistureData = [];
+      }
+
       isLoading = false;
     });
   }
 
-  List<FlSpot> _extractData(String key) {
-    return sensorData
+  List<FlSpot> _extractData(String key, List<dynamic> data) {
+    return data
         .map<FlSpot>((entry) => FlSpot(
               DateTime.parse(entry['timestamp'])
                   .millisecondsSinceEpoch
@@ -50,7 +62,7 @@ class _SensorDataScreenState extends State<SensorDataScreen> {
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
-          : sensorData.isEmpty
+          : (generalSensorData.isEmpty && soilMoistureData.isEmpty)
               ? const Center(
                   child: Text("No sensor data available."),
                 )
@@ -70,28 +82,28 @@ class _SensorDataScreenState extends State<SensorDataScreen> {
                       _SensorChart(
                         title: 'Temperature',
                         color: Colors.red,
-                        data: _extractData('temperature'),
+                        data: _extractData('temperature', generalSensorData),
                         unit: '°C',
                       ),
                       const SizedBox(height: 24),
                       _SensorChart(
                         title: 'Humidity',
                         color: Colors.blue,
-                        data: _extractData('humidity'),
+                        data: _extractData('humidity', generalSensorData),
                         unit: '%',
                       ),
                       const SizedBox(height: 24),
                       _SensorChart(
                         title: 'Light Intensity',
                         color: Colors.orange,
-                        data: _extractData('lightIntensity'),
-                        unit: 'lux',
+                        data: _extractData('lightIntensity', generalSensorData),
+                        unit: '%',
                       ),
                       const SizedBox(height: 24),
                       _SensorChart(
                         title: 'Soil Moisture',
                         color: Colors.green,
-                        data: _extractData('soilMoisture'),
+                        data: _extractData('soilMoisture', soilMoistureData),
                         unit: '%',
                       ),
                     ],
