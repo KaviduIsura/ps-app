@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   static const String baseUrl =
-      "http://localhost:5000/api"; // Replace localhost with your actual backend URL
+      "http://localhost:5003/api"; // Replace localhost with your actual backend URL
 
   // Fetch sensor data
   static Future<Map<String, dynamic>?> getSensorData() async {
