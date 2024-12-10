@@ -8,13 +8,10 @@ class ManualControlsScreen extends StatefulWidget {
 }
 
 class _ManualControlsScreenState extends State<ManualControlsScreen> {
-  bool _fanPower = false;
-  double _fanSpeed = 0;
-  bool _lightingPower = false;
-  double _lightingBrightness = 0;
-  bool _irrigationPower = false;
-  String _irrigationDuration = '5 minutes';
-  double _targetTemperature = 18;
+  bool _humiFan = false;
+  bool _lighting = false;
+  bool _irrigation = false;
+  bool _tepmFan = false;
 
   @override
   Widget build(BuildContext context) {
@@ -37,25 +34,15 @@ class _ManualControlsScreenState extends State<ManualControlsScreen> {
             children: [
               SwitchListTile(
                 title: const Text('Power'),
-                value: _fanPower,
+                value: _humiFan,
                 onChanged: (value) {
                   setState(() {
-                    _fanPower = value;
+                    _humiFan = value;
                   });
                 },
               ),
               const SizedBox(height: 8),
               const Text('Speed'),
-              Slider(
-                value: _fanSpeed,
-                onChanged: (value) {
-                  setState(() {
-                    _fanSpeed = value;
-                  });
-                },
-                label: '${(_fanSpeed * 100).round()}%',
-                divisions: 10,
-              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -65,25 +52,15 @@ class _ManualControlsScreenState extends State<ManualControlsScreen> {
             children: [
               SwitchListTile(
                 title: const Text('Power'),
-                value: _lightingPower,
+                value: _lighting,
                 onChanged: (value) {
                   setState(() {
-                    _lightingPower = value;
+                    _lighting = value;
                   });
                 },
               ),
               const SizedBox(height: 8),
               const Text('Brightness'),
-              Slider(
-                value: _lightingBrightness,
-                onChanged: (value) {
-                  setState(() {
-                    _lightingBrightness = value;
-                  });
-                },
-                label: '${(_lightingBrightness * 100).round()}%',
-                divisions: 10,
-              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -93,34 +70,15 @@ class _ManualControlsScreenState extends State<ManualControlsScreen> {
             children: [
               SwitchListTile(
                 title: const Text('Power'),
-                value: _irrigationPower,
+                value: _irrigation,
                 onChanged: (value) {
                   setState(() {
-                    _irrigationPower = value;
+                    _irrigation = value;
                   });
                 },
               ),
               const SizedBox(height: 8),
               const Text('Duration'),
-              DropdownButton<String>(
-                value: _irrigationDuration,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _irrigationDuration = newValue!;
-                  });
-                },
-                items: <String>[
-                  '5 minutes',
-                  '10 minutes',
-                  '15 minutes',
-                  '30 minutes'
-                ].map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -128,19 +86,15 @@ class _ManualControlsScreenState extends State<ManualControlsScreen> {
             title: 'Temperature Control',
             icon: Icons.thermostat,
             children: [
-              const Text('Target Temperature'),
-              Slider(
-                value: _targetTemperature,
-                min: 10,
-                max: 30,
-                divisions: 20,
-                label: '${_targetTemperature.round()}°C',
+              SwitchListTile(
+                title: const Text('Power'),
+                value: _tepmFan,
                 onChanged: (value) {
                   setState(() {
-                    _targetTemperature = value;
+                    _tepmFan = value;
                   });
                 },
-              ),
+              )
             ],
           ),
         ],

@@ -66,4 +66,23 @@ class ApiService {
       return null;
     }
   }
+
+  // Updated updateControlState function to handle all control parameters
+  static Future<bool> updateControlState(Map<String, dynamic> data) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/control'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(data),
+      );
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception('Failed to update control state');
+      }
+    } catch (e) {
+      print('Error updating control state: $e');
+      return false;
+    }
+  }
 }
